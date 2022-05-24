@@ -62,10 +62,10 @@ scene("game", ({ level, score }) => {
     const levelCfg = {
         width: 48,
         height: 48,
-        'a': [sprite('left-wall'), solid()],
-        'd': [sprite('right-wall'), solid()],
-        'w': [sprite('top-wall'), solid()],
-        'x': [sprite('bottom-wall'), solid()],
+        'a': [sprite('left-wall'), solid(), 'wall'],
+        'd': [sprite('right-wall'), solid(), 'wall'],
+        'w': [sprite('top-wall'), solid(), 'wall'],
+        'x': [sprite('bottom-wall'), solid(), 'wall'],
         'q': [sprite('top-left-corner'), solid()],
         'e': [sprite('top-right-corner'), solid()],
         'z': [sprite('bottom-left-corner'), solid()],
@@ -73,8 +73,8 @@ scene("game", ({ level, score }) => {
         '!': [sprite('left-door'), solid()],
         '@': [sprite('top-door'), 'next-level'],
         '^': [sprite('stairs'), 'next-level'],
-        '*': [sprite('slicer'), 'slicer', { dir: -1 }],
-        '$': [sprite('skeletor') ],
+        '*': [sprite('slicer'), 'slicer', { dir: -1 }, 'dangerous'],
+        '$': [sprite('skeletor'), 'dangerous', 'skeletor', { dir: -1 }],
         '%': [sprite('lanterns'), solid()],
         '&': [sprite('fire-pot'), solid()],
     }
@@ -148,6 +148,33 @@ scene("game", ({ level, score }) => {
     action('slicer', (s) => {
         s.move(s.dir * SLICER_SPEED, 0)
     })
+
+    collides('slicer', 'wall', (s) => {
+        s.dir = -s.dir
+    })
+
+    const SKELETOR_SPEED = 60
+
+    action('skeletor', (s) => {
+
+    })
+
+    player.overlaps('dangerous', () => {
+        go('lose', { score: scoreLabel.value})
+    })
 })
 
-start("game", { level: 0, score:0 })
+scene("lose", ({ score }) => {
+    add([
+        text('gameover', 32),
+        origin('center'),
+        pos(width() / 2, height() / 4)
+    ])
+    add([
+        text(score, 32),
+        origin('center'),
+        pos(width() / 2, height() / 2)
+    ])
+})
+
+start("game", { level: 0, score: 0 })
