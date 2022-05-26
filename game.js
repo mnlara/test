@@ -74,7 +74,7 @@ scene("game", ({ level, score }) => {
         '@': [sprite('top-door'), 'next-level'],
         '^': [sprite('stairs'), 'next-level'],
         '*': [sprite('slicer'), 'slicer', { dir: -1 }, 'dangerous'],
-        '$': [sprite('skeletor'), 'dangerous', 'skeletor', { dir: -1 }],
+        '$': [sprite('skeletor'), 'dangerous', 'skeletor', { dir: -1, timer: 0 }],
         '%': [sprite('lanterns'), solid()],
         '&': [sprite('fire-pot'), solid()],
     }
@@ -143,6 +143,14 @@ scene("game", ({ level, score }) => {
         player.dir = vec2(0, 1)
     })
 
+    function spawnKaboom(p) {
+        const obj = add([
+            sprite('kaboom'),
+            pos(p),
+            'kaboom'
+        ])
+    }
+
     const SLICER_SPEED = 100
 
     action('slicer', (s) => {
@@ -156,7 +164,16 @@ scene("game", ({ level, score }) => {
     const SKELETOR_SPEED = 60
 
     action('skeletor', (s) => {
+        s.move(0, s.dir * SKELETOR_SPEED)
+        s.timer -= dt()
+        if (s.timer <= 0) {
+            s.dir = -s.dir
+            s.timer = rand(5)
+        }
+    })
 
+    collides('skeletor', 'wall', (s) => {
+        s.dir = -s.dir
     })
 
     player.overlaps('dangerous', () => {
